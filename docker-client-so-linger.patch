@@ -1,0 +1,57 @@
+From 5dd60622ba3754e6c526ee0a69dd20c282738d74 Mon Sep 17 00:00:00 2001
+From: Roland Grunberg <rgrunber@redhat.com>
+Date: Fri, 10 Jul 2015 14:22:14 -0400
+Subject: [PATCH] Implement SO_LINGER.
+
+Apache httpcpomponents-core 4.4 calls setSoLinger.
+---
+ .../java/com/spotify/docker/client/ApacheUnixSocket.java  | 15 +++++++++++++--
+ 1 file changed, 13 insertions(+), 2 deletions(-)
+
+diff --git src/main/java/com/spotify/docker/client/ApacheUnixSocket.java src/main/java/com/spotify/docker/client/ApacheUnixSocket.java
+index 851ed1c..5a45234 100644
+--- src/main/java/com/spotify/docker/client/ApacheUnixSocket.java
++++ src/main/java/com/spotify/docker/client/ApacheUnixSocket.java
+@@ -48,6 +48,7 @@ public class ApacheUnixSocket extends Socket {
+ 
+   private final UnixSocketChannel inner;
+   private SocketAddress addr;
++  private int lingerTime;
+ 
+   private final Queue<SocketOptionSetter> optionsToSet = Queues.newArrayDeque();
+ 
+@@ -162,12 +163,14 @@ public class ApacheUnixSocket extends Socket {
+ 
+   @Override
+   public void setSoLinger(final boolean on, final int linger) throws SocketException {
+-    throw new UnsupportedOperationException("Unimplemented");
++    if (on) {
++      lingerTime = linger;
++    }
+   }
+ 
+   @Override
+   public int getSoLinger() throws SocketException {
+-    throw new UnsupportedOperationException("Unimplemented");
++    return lingerTime;
+   }
+ 
+   @Override
+@@ -257,6 +260,14 @@ public class ApacheUnixSocket extends Socket {
+ 
+   @Override
+   public synchronized void close() throws IOException {
++    if (lingerTime > 0) {
++      try {
++        Thread.sleep(lingerTime * 1000);
++      } catch (InterruptedException e) {
++      }
++    }
++    shutdownInput();
++    shutdownOutput();
+     inner.close();
+   }
+ 
+-- 
+2.1.0
+
