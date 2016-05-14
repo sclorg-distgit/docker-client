@@ -6,7 +6,7 @@ diff -up ./MANIFEST.MF.fix ./MANIFEST.MF
 +Bundle-ManifestVersion: 2
 +Bundle-Name: Docker Client
 +Bundle-SymbolicName: com.spotify.docker.client
-+Bundle-Version: 3.1.1.qualifier
++Bundle-Version: 3.1.9.qualifier
 +Bundle-ActivationPolicy: lazy
 +Bundle-Vendor: Eclipse Orbit
 +Bundle-RequiredExecutionEnvironment: JavaSE-1.7
