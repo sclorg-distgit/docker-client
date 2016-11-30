@@ -1,0 +1,76 @@
+diff -up ./MANIFEST.MF.fix ./MANIFEST.MF
+--- ./MANIFEST.MF.fix	2015-06-08 16:40:00.000000000 -0400
++++ ./MANIFEST.MF	2015-06-08 16:40:33.000000000 -0400
+@@ -0,0 +1,51 @@
++Manifest-Version: 1.0
++Bundle-ManifestVersion: 2
++Bundle-Name: Docker Client
++Bundle-SymbolicName: com.spotify.docker.client
++Bundle-Version: 4.0.6
++Bundle-ActivationPolicy: lazy
++Bundle-Vendor: Eclipse Orbit
++Bundle-RequiredExecutionEnvironment: JavaSE-1.7
++Bundle-Localization: plugin
++Export-Package: com.spotify.docker.client,
++ com.spotify.docker.client.exceptions,
++ com.spotify.docker.client.messages
++Import-Package: com.fasterxml.jackson.annotation;version="2.2.3",
++ com.fasterxml.jackson.core;version="2.2.3",
++ com.fasterxml.jackson.databind;version="2.2.3",
++ com.fasterxml.jackson.databind.module;version="2.2.3",
++ com.fasterxml.jackson.databind.node;version="2.2.3",
++ com.fasterxml.jackson.databind.util;version="2.2.3",
++ com.fasterxml.jackson.datatype.guava;version="2.2.3",
++ com.google.common.base;version="15.0.0",
++ com.google.common.collect;version="15.0.0",
++ com.google.common.io;version="15.0.0",
++ com.google.common.net;version="15.0.0",
++ javax.net.ssl,
++ javax.ws.rs;version="2.0.1",
++ javax.ws.rs.client;version="2.0.1",
++ javax.ws.rs.core;version="2.0.1",
++ javax.ws.rs.ext;version="2.0.1",
++ jnr.unixsocket;version="0.4.0",
++ org.apache.commons.compress.archivers;version="1.5.0",
++ org.apache.commons.compress.archivers.tar;version="1.5.0",
++ org.apache.commons.compress.compressors.gzip;version="1.5.0",
++ org.apache.http;version="4.3.2",
++ org.apache.http.client.config;version="4.3.5",
++ org.apache.http.client.methods;version="4.3.5",
++ org.apache.http.config;version="4.3.2",
++ org.apache.http.conn;version="4.3.4",
++ org.apache.http.conn.socket;version="4.3.5",
++ org.apache.http.conn.ssl;version="4.3.5",
++ org.apache.http.impl.conn;version="4.3.5",
++ org.apache.http.protocol;version="4.3.2",
++ org.bouncycastle.asn1.pkcs,
++ org.bouncycastle.openssl,
++ org.glassfish.hk2.api;version="2.3.0",
++ org.glassfish.jersey.apache.connector,
++ org.glassfish.jersey.client;version="2.13.0",
++ org.glassfish.jersey.client.spi;version="2.13.0",
++ org.glassfish.jersey.internal.util;version="2.13.0",
++ org.glassfish.jersey.jackson;version="2.13.0",
++ org.slf4j;version="1.7.2"
++Require-Bundle: org.glassfish.hk2.locator;bundle-version="2.3.0"
+diff -up ./pom.xml.fix ./pom.xml
+--- ./pom.xml.fix	2015-06-08 16:37:22.000000000 -0400
++++ ./pom.xml	2015-06-08 16:39:49.000000000 -0400
+@@ -225,6 +225,17 @@
+           </execution>
+         </executions>
+       </plugin>
++
++      <plugin>
++        <groupId>org.apache.maven.plugins</groupId>
++        <artifactId>maven-jar-plugin</artifactId>
++        <configuration>
++          <archive>
++            <manifestFile>MANIFEST.MF</manifestFile>
++          </archive>
++        </configuration>
++      </plugin>
++
+       <plugin>
+         <groupId>org.apache.maven.plugins</groupId>
+         <artifactId>maven-source-plugin</artifactId>

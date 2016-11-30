@@ -1,0 +1,76 @@
+--- src/main/java/com/spotify/docker/client/DockerCertificates.java.orig	2016-07-29 16:50:37.574841085 +0100
++++ src/main/java/com/spotify/docker/client/DockerCertificates.java	2016-07-29 16:52:58.950238639 +0100
+@@ -20,9 +20,10 @@
+ import com.spotify.docker.client.exceptions.DockerCertificateException;
+ 
+ import com.google.common.base.Optional;
++import org.apache.http.conn.ssl.SSLConnectionSocketFactory;
+ 
+-import org.apache.http.conn.ssl.NoopHostnameVerifier;
+-import org.apache.http.ssl.SSLContexts;
++import org.apache.http.conn.ssl.SSLContexts;
++import org.apache.http.conn.ssl.X509HostnameVerifier;
+ import org.bouncycastle.openssl.PEMKeyPair;
+ import org.bouncycastle.openssl.PEMParser;
+ import org.slf4j.Logger;
+@@ -47,7 +48,6 @@
+ import java.security.spec.InvalidKeySpecException;
+ import java.security.spec.PKCS8EncodedKeySpec;
+ 
+-import javax.net.ssl.HostnameVerifier;
+ import javax.net.ssl.SSLContext;
+ 
+ /**
+@@ -105,8 +105,9 @@
+       keyStore.setKeyEntry("key", clientKey, KEY_STORE_PASSWORD, new Certificate[] {clientCert});
+ 
+       this.sslContext = SSLContexts.custom()
+-          .loadTrustMaterial(trustStore, null)
++          .loadTrustMaterial(trustStore)
+           .loadKeyMaterial(keyStore, KEY_STORE_PASSWORD)
++          .useTLS()
+           .build();
+     } catch (
+         CertificateException |
+@@ -124,8 +125,8 @@
+     return this.sslContext;
+   }
+ 
+-  public HostnameVerifier hostnameVerifier() {
+-    return NoopHostnameVerifier.INSTANCE;
++  public X509HostnameVerifier hostnameVerifier() {
++    return SSLConnectionSocketFactory.ALLOW_ALL_HOSTNAME_VERIFIER;
+   }
+ 
+   public static Builder builder() {
+--- src/main/java/com/spotify/docker/client/DefaultDockerClient.java.orig	2016-07-29 16:58:34.274410938 +0100
++++ src/main/java/com/spotify/docker/client/DefaultDockerClient.java	2016-07-29 16:59:14.862947623 +0100
+@@ -67,7 +67,6 @@
+ import com.google.common.io.CharStreams;
+ import com.google.common.net.HostAndPort;
+ 
+-import org.apache.commons.compress.utils.IOUtils;
+ import org.apache.http.client.config.RequestConfig;
+ import org.apache.http.client.methods.CloseableHttpResponse;
+ import org.apache.http.client.methods.HttpGet;
+@@ -927,10 +926,19 @@
+     } catch (IOException e) {
+       throw new DockerException(e);
+     } finally {
+-      IOUtils.closeQuietly(imagePayload);
++      closeQuietly(imagePayload);
+     }
+   }
+ 
++    public static void closeQuietly(Closeable c) {
++        if (c != null) {
++            try {
++                c.close();
++            } catch (IOException ignored) { // NOPMD
++            }
++        }
++    }
++
+   @Override
+   public InputStream save(final String image)
+       throws DockerException, IOException, InterruptedException {
